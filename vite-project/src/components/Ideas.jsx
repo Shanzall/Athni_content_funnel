@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { Plus, ExternalLink, Edit3, Bell, UserPlus, X, Check } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
-const IDEATORS = ['Sarah Chen', 'Alex Rodriguez', 'Maya Patel', 'David Kim', 'Emma Thompson'];
+const IDEATORS = ['Dagim', 'Trial', 'Maya Patel', 'David Kim', 'Emma Thompson'];
 const CATEGORIES = ['Product Feature', 'UI/UX', 'User Experience', 'Technical', 'Marketing'];
 const CHANNELS = ['Slack', 'Email', 'Forum'];
-const EXECUTORS = ['John Smith', 'Lisa Wang', 'Mike Johnson', 'Anna Davis', 'Tom Wilson'];
+const EXECUTORS = ['Shanzal', 'Mehretab', 'Athni', 'Anna Davis', 'Tom Wilson'];
 
 // Map names to emails
 const IDEATOR_EMAILS = {
@@ -18,9 +18,9 @@ const IDEATOR_EMAILS = {
 const EXECUTOR_EMAILS = {
   'John Smith': 'shanzalsiddiqui2@gmail.com',
   'Lisa Wang': 'lisa.wang@email.com',
-  'Mike Johnson': 'mike.johnson@email.com',
-  'Anna Davis': 'anna.davis@email.com',
-  'Tom Wilson': 'tom.wilson@email.com',
+  'Athni': 'athnitesfaye@gmail.com',
+  'Mehretab': 'mehretab@gmail.com',
+  'Shanzal': 'shanzalsiddiqui2@gmail.com',
 };
 
 // EmailJS config (replace with your actual values)
