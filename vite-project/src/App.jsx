@@ -11,8 +11,8 @@ function App() {
       <div className="max-w-6xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold mb-2">Ideas & Drafts Tracker</h1>
-          <p className="text-gray-400 text-sm">Manage your ideas and drafts in one place</p>
+          <h1 className="text-2xl font-semibold mb-2">Hire Armada Content Funnel</h1>
+          <p className="text-gray-400 text-sm">All ideas and drafts are managed here</p>
         </div>
 
         {/* Tab Navigation */}

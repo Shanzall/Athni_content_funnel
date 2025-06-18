@@ -3,14 +3,14 @@ import { Plus, ExternalLink, Edit3, Bell, UserPlus, X, Check } from 'lucide-reac
 import emailjs from '@emailjs/browser';
 
 const IDEATORS = ['Dagim', 'Trial', 'Maya Patel', 'David Kim', 'Emma Thompson'];
-const CATEGORIES = ['Product Feature', 'UI/UX', 'User Experience', 'Technical', 'Marketing'];
-const CHANNELS = ['Slack', 'Email', 'Forum'];
+const CATEGORIES = ['Educational', 'Entertaining', 'Timely-News', 'Inspirational', 'Listicles'];
+const CHANNELS = ['X: Athni', 'L: Athni', 'L: [H]', 'X: [H]', 'Ins: [H]'];
 const EXECUTORS = ['Shanzal', 'Mehretab', 'Athni', 'Anna Davis', 'Tom Wilson'];
 
 // Map names to emails
 const IDEATOR_EMAILS = {
-  'Sarah Chen': 'mohitraghav350@gmail.com',
-  'Alex Rodriguez': 'alex.rodriguez@email.com',
+  'Dagim': 'mohitraghav350@gmail.com',
+  'Trial': 'alex.rodriguez@email.com',
   'Maya Patel': 'maya.patel@email.com',
   'David Kim': 'david.kim@email.com',
   'Emma Thompson': 'emma.thompson@email.com',

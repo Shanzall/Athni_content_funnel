@@ -2,17 +2,17 @@ import { useState } from 'react';
 import { Plus, ExternalLink, Edit3, Bell, RotateCcw, X, Check } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 
-// EmailJS config (using same values as Ideas component)
+// EmailJS config
 const EMAILJS_SERVICE_ID = 'service_evmoydf';
 const EMAILJS_TEMPLATE_REJECT = 'template_n0u5g98';
 const EMAILJS_TEMPLATE_CONFIRM = 'template_23ru5i2';
 const EMAILJS_PUBLIC_KEY = 'NKJdATGaWOlV_l_BI';
 
-// Map executors to emails (using same as Ideas component)
+// Map executors to emails
 const EXECUTOR_EMAILS = {
-  'John Smith': 'shanzalsiddiqui2@gmail.com',
-  'Lisa Wang': 'lisa.wang@email.com',
-  'Mike Johnson': 'mike.johnson@email.com',
+  'Shanzal': 'shanzalsiddiqui2@gmail.com',
+  'Mehretab': 'mehretab@email.com',
+  'Athni': 'athni@email.com',
   'Anna Davis': 'anna.davis@email.com',
   'Tom Wilson': 'tom.wilson@email.com',
 };
@@ -24,21 +24,21 @@ function Drafts() {
       title: 'Q4 Marketing Strategy Document',
       link: 'https://drive.google.com/marketing-q4',
       status: 'Pending',
-      executor: 'John Smith'
+      executor: 'Shanzal'
     },
     {
       id: 2,
       title: 'API Documentation v2.0',
       link: 'https://drive.google.com/api-docs',
       status: 'Confirmed',
-      executor: 'Lisa Wang'
+      executor: 'Mehretab'
     },
     {
       id: 3,
       title: 'Product Roadmap 2025',
       link: 'https://drive.google.com/roadmap-2025',
       status: 'Rejected',
-      executor: 'Mike Johnson'
+      executor: 'Athni'
     }
   ]);
 
@@ -92,7 +92,7 @@ function Drafts() {
   };
 
   const handleNotify = (draft) => {
-    addNotification(`Notification sent for draft: "${draft.title}"`);
+    addNotification(`Notification sent for draft: "${draft.title}" to ${draft.executor}`);
   };
 
   const handleResubmit = (draft) => {
@@ -131,7 +131,6 @@ function Drafts() {
     }, {});
   };
 
-  // Helper to send email via EmailJS
   const sendEmail = (templateId, variables) => {
     return emailjs.send(
       EMAILJS_SERVICE_ID,
@@ -172,9 +171,11 @@ function Drafts() {
       to_email: EXECUTOR_EMAILS[draft.executor] || 'default@email.com',
       draft_title: draft.title,
       executor_name: draft.executor,
+      executor_email: EXECUTOR_EMAILS[draft.executor] || 'default@email.com'
     }).then(() => {
       addNotification(`Rejection email sent to ${draft.executor}`);
-    }).catch(() => {
+    }).catch((error) => {
+      console.error('Email error:', error);
       addNotification('Failed to send rejection email');
     });
   };
@@ -333,7 +334,7 @@ function Drafts() {
         </div>
       )}
 
-      {/* Drafts by Status */}
+      {/* Draft Cards */}
       {Object.entries(groupByStatus(drafts)).map(([status, statusDrafts]) => (
         <div key={status} className="mb-8">
           <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
