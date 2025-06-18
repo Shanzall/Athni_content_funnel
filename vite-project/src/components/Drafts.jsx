@@ -1,5 +1,21 @@
 import { useState } from 'react';
 import { Plus, ExternalLink, Edit3, Bell, RotateCcw, X, Check } from 'lucide-react';
+import emailjs from '@emailjs/browser';
+
+// EmailJS config (using same values as Ideas component)
+const EMAILJS_SERVICE_ID = 'service_evmoydf';
+const EMAILJS_TEMPLATE_REJECT = 'template_n0u5g98';
+const EMAILJS_TEMPLATE_CONFIRM = 'template_23ru5i2';
+const EMAILJS_PUBLIC_KEY = 'NKJdATGaWOlV_l_BI';
+
+// Map executors to emails (using same as Ideas component)
+const EXECUTOR_EMAILS = {
+  'John Smith': 'shanzalsiddiqui2@gmail.com',
+  'Lisa Wang': 'lisa.wang@email.com',
+  'Mike Johnson': 'mike.johnson@email.com',
+  'Anna Davis': 'anna.davis@email.com',
+  'Tom Wilson': 'tom.wilson@email.com',
+};
 
 function Drafts() {
   const [drafts, setDrafts] = useState([
@@ -7,19 +23,22 @@ function Drafts() {
       id: 1,
       title: 'Q4 Marketing Strategy Document',
       link: 'https://drive.google.com/marketing-q4',
-      status: 'Pending'
+      status: 'Pending',
+      executor: 'John Smith'
     },
     {
       id: 2,
       title: 'API Documentation v2.0',
       link: 'https://drive.google.com/api-docs',
-      status: 'Confirmed'
+      status: 'Confirmed',
+      executor: 'Lisa Wang'
     },
     {
       id: 3,
       title: 'Product Roadmap 2025',
       link: 'https://drive.google.com/roadmap-2025',
-      status: 'Rejected'
+      status: 'Rejected',
+      executor: 'Mike Johnson'
     }
   ]);
 
@@ -30,12 +49,13 @@ function Drafts() {
 
   const [formData, setFormData] = useState({
     title: '',
-    link: ''
+    link: '',
+    executor: ''
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.title && formData.link) {
+    if (formData.title && formData.link && formData.executor) {
       const newDraft = {
         id: Date.now(),
         ...formData,
@@ -44,7 +64,8 @@ function Drafts() {
       setDrafts([...drafts, newDraft]);
       setFormData({
         title: '',
-        link: ''
+        link: '',
+        executor: ''
       });
       setShowForm(false);
       addNotification('New draft submitted successfully');
@@ -53,7 +74,7 @@ function Drafts() {
 
   const handleEdit = (e) => {
     e.preventDefault();
-    if (editingDraft && formData.title && formData.link) {
+    if (editingDraft && formData.title && formData.link && formData.executor) {
       setDrafts(drafts.map(draft => 
         draft.id === editingDraft.id 
           ? { ...draft, ...formData }
@@ -63,7 +84,8 @@ function Drafts() {
       setEditModalOpen(false);
       setFormData({
         title: '',
-        link: ''
+        link: '',
+        executor: ''
       });
       addNotification('Draft updated successfully');
     }
@@ -107,6 +129,54 @@ function Drafts() {
       acc[status] = items.filter(item => item.status === status);
       return acc;
     }, {});
+  };
+
+  // Helper to send email via EmailJS
+  const sendEmail = (templateId, variables) => {
+    return emailjs.send(
+      EMAILJS_SERVICE_ID,
+      templateId,
+      variables,
+      EMAILJS_PUBLIC_KEY
+    );
+  };
+
+  const handleConfirm = (draft) => {
+    setDrafts(drafts.map(d =>
+      d.id === draft.id ? { ...d, status: 'Confirmed' } : d
+    ));
+    addNotification(`Draft "${draft.title}" was confirmed.`);
+    
+    // Send confirmation email
+    sendEmail(EMAILJS_TEMPLATE_CONFIRM, {
+      to_email: EXECUTOR_EMAILS[draft.executor] || 'default@email.com',
+      draft_title: draft.title,
+      executor_name: draft.executor,
+      executor_email: EXECUTOR_EMAILS[draft.executor] || 'default@email.com'
+    }).then(() => {
+      addNotification(`Confirmation email sent to ${draft.executor}`);
+    }).catch((error) => {
+      console.error('Email error:', error);
+      addNotification('Failed to send confirmation email');
+    });
+  };
+
+  const handleReject = (draft) => {
+    setDrafts(drafts.map(d =>
+      d.id === draft.id ? { ...d, status: 'Rejected' } : d
+    ));
+    addNotification(`Draft "${draft.title}" was rejected.`);
+    
+    // Send rejection email
+    sendEmail(EMAILJS_TEMPLATE_REJECT, {
+      to_email: EXECUTOR_EMAILS[draft.executor] || 'default@email.com',
+      draft_title: draft.title,
+      executor_name: draft.executor,
+    }).then(() => {
+      addNotification(`Rejection email sent to ${draft.executor}`);
+    }).catch(() => {
+      addNotification('Failed to send rejection email');
+    });
   };
 
   return (
@@ -158,12 +228,23 @@ function Drafts() {
               />
               <input
                 type="url"
-                placeholder="Link to location (e.g. Google Drive)"
+                placeholder="Link to Document"
                 value={formData.link}
                 onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                 required
               />
+              <select
+                value={formData.executor}
+                onChange={(e) => setFormData({ ...formData, executor: e.target.value })}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="">Select Executor</option>
+                {Object.keys(EXECUTOR_EMAILS).map(executor => (
+                  <option key={executor} value={executor}>{executor}</option>
+                ))}
+              </select>
             </div>
             <div className="flex gap-2">
               <button
@@ -178,7 +259,8 @@ function Drafts() {
                   setShowForm(false);
                   setFormData({
                     title: '',
-                    link: ''
+                    link: '',
+                    executor: ''
                   });
                 }}
                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
@@ -206,12 +288,23 @@ function Drafts() {
               />
               <input
                 type="url"
-                placeholder="Link to location (e.g. Google Drive)"
+                placeholder="Link to Document"
                 value={formData.link}
                 onChange={(e) => setFormData({ ...formData, link: e.target.value })}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
                 required
               />
+              <select
+                value={formData.executor}
+                onChange={(e) => setFormData({ ...formData, executor: e.target.value })}
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-blue-500"
+                required
+              >
+                <option value="">Select Executor</option>
+                {Object.keys(EXECUTOR_EMAILS).map(executor => (
+                  <option key={executor} value={executor}>{executor}</option>
+                ))}
+              </select>
               <div className="flex gap-2">
                 <button
                   type="submit"
@@ -226,7 +319,8 @@ function Drafts() {
                     setEditingDraft(null);
                     setFormData({
                       title: '',
-                      link: ''
+                      link: '',
+                      executor: ''
                     });
                   }}
                   className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
@@ -259,13 +353,18 @@ function Drafts() {
                   </span>
                 </div>
                 
-                <div className="mb-4">
+                <div className="space-y-2 mb-4">
                   {draft.link && (
                     <a href={draft.link} target="_blank" rel="noopener noreferrer" 
                        className="flex items-center gap-1 text-blue-400 hover:text-blue-300 text-xs">
                       <ExternalLink size={12} />
                       View Document
                     </a>
+                  )}
+                  {draft.executor && (
+                    <div className="text-xs text-green-400">
+                      Executor: {draft.executor}
+                    </div>
                   )}
                 </div>
                 
@@ -282,7 +381,8 @@ function Drafts() {
                       setEditingDraft(draft);
                       setFormData({
                         title: draft.title,
-                        link: draft.link
+                        link: draft.link,
+                        executor: draft.executor
                       });
                       setEditModalOpen(true);
                     }}
@@ -291,6 +391,24 @@ function Drafts() {
                     <Edit3 size={12} />
                     Edit
                   </button>
+                  {draft.status === 'Pending' && (
+                    <>
+                      <button
+                        onClick={() => handleConfirm(draft)}
+                        className="flex items-center gap-1 px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
+                      >
+                        <Check size={12} />
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => handleReject(draft)}
+                        className="flex items-center gap-1 px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                      >
+                        <X size={12} />
+                        Reject
+                      </button>
+                    </>
+                  )}
                   {draft.status === 'Rejected' && (
                     <button 
                       onClick={() => handleResubmit(draft)}
